@@ -249,6 +249,7 @@ export default class Player {
           break;
         }
         case COLLISION_BODIES.ENDRAMP: {
+          const deltaTime = this.time.delta / 1000;
           this.isReachedDestination = true;
           this.scene.remove(this.playerBallCnt);
           this.endCameraAnimation();
@@ -275,7 +276,7 @@ export default class Player {
                   .to(this.RigidBodiesArr[i].velocity, {
                     duration: 2,
                     x: 0,
-                    y: -0.5,
+                    y: -0.5 * deltaTime,
                     z: 0,
                   })
                   .then(() => {
@@ -301,49 +302,49 @@ export default class Player {
               (item) => item.name === collide.target.name
             );
             // if (collectedBall) this.RigidBodiesArr[collectedBall];
-            let gemCollected = this.gemModel.clone().children.shift();
-            gemCollected.position.set(
-              Math.random() * (6.2 - -6.2) + -6.2,
-              collide.body.position.y + 5,
-              collide.body.position.z
-            );
+            for (let i = 0; i < Number(collide.body.myData.score[0]); i++) {
+              let gemCollected = this.gemModel.clone().children.shift();
+              gemCollected.position.set(
+                Math.random() * (6.2 - -6.2) + -6.2,
+                collide.body.position.y + 5,
+                collide.body.position.z
+              );
+              this.scene.add(gemCollected);
 
-            this.scene.add(gemCollected);
-
+              const timeline = gsap.timeline();
+              timeline
+                .to(gemCollected.position, {
+                  duration: 0.3,
+                  y: collide.target.position.y + Math.random() * 7,
+                })
+                .to(gemCollected.scale, {
+                  duration: 1,
+                  x: 0.02,
+                  y: 0.02,
+                  z: 0.02,
+                }) // Scale in
+                .to(gemCollected.scale, {
+                  duration: 0.8,
+                  x: 0.015,
+                  y: 0.015,
+                  z: 0.015,
+                }) // Scale out
+                .to(gemCollected.position, {
+                  duration: 1,
+                  x: 12,
+                  y: 48,
+                  z: this.endWallPositionZ,
+                })
+                .then(() => {
+                  ++this.gemCollected;
+                  document.getElementById("gemsCollected").textContent =
+                    this.gemCollected;
+                  gemCollected.material.dispose();
+                  gemCollected.geometry.dispose();
+                  this.scene.remove(gemCollected);
+                });
+            }
             // Gem Animation
-
-            const timeline = gsap.timeline();
-            timeline
-              .to(gemCollected.position, {
-                duration: 0.3,
-                y: collide.target.position.y + Math.random() * 7,
-              })
-              .to(gemCollected.scale, {
-                duration: 1,
-                x: 0.02,
-                y: 0.02,
-                z: 0.02,
-              }) // Scale in
-              .to(gemCollected.scale, {
-                duration: 0.8,
-                x: 0.015,
-                y: 0.015,
-                z: 0.015,
-              }) // Scale out
-              .to(gemCollected.position, {
-                duration: 1,
-                x: 12,
-                y: 48,
-                z: this.endWallPositionZ,
-              })
-              .then(() => {
-                ++this.gemCollected;
-                document.getElementById("gemsCollected").textContent =
-                  this.gemCollected;
-                gemCollected.material.dispose();
-                gemCollected.geometry.dispose();
-                this.scene.remove(gemCollected);
-              });
           }
           collide.body.position.set(900, 200, 0);
           break;
@@ -447,13 +448,12 @@ export default class Player {
 
   update() {
     // Update snake's head position based on this.direction
-    // this.playerVelocity += -200 * this.time.delta;
+    const deltaTime = this.time.delta / 1000;
     if (this.headBody && !this.isReachedDestination) {
       // this.headBody.velocity.z = Math.round(this.playerVelocity);
-      this.headBody.velocity.z = -15;
-      this.headBody.velocity.x = 0;
+      this.headBody.velocity.z = -15 * deltaTime;
+      this.headBody.velocity.x = 0 * deltaTime;
       if (this.headBody.velocity.z > -10) {
-        // this.headBody.velocity.z = Math.round(this.playerVelocity);
         this.headBody.velocity.z = -15;
       }
       this.playerBallCnt.position.x = this.headBody.position.x;

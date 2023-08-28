@@ -9,11 +9,11 @@ export default class CenterRamp {
     this.experience = new Experience();
     const { resources, scene, physicsWorld } = this.experience;
     this.resources = resources;
+    this.scene = scene;
+    this.physicsWorld = physicsWorld;
     this.rampModel = resources.items.CenterRamp.children[0];
     this.rampModelTexture = resources.items.CenterRampTexture;
     this.rampMaterial = rampMaterial;
-    this.physicsWorld = physicsWorld;
-    this.scene = scene;
     this.setModel(position);
   }
 

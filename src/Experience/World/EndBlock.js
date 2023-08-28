@@ -1,5 +1,5 @@
 import Experience from "../Experience";
-import { WINBOX_PROPS } from "../Utils/Constants";
+import { DIAGONAL_WALLS_PROPS, WINBOX_PROPS } from "../Utils/Constants";
 import { getPhysicsBody } from "../Utils/PhycisBodyHelper";
 import { ShapeType } from "three-to-cannon";
 
@@ -37,18 +37,12 @@ export default class EndBlock {
 
   contructLastBlock(positionZ, wallMaterial) {
     this.wallMaterial = wallMaterial;
-    this.endWall = this.constructEndWall(15, positionZ);
+    const endWall = this.constructEndWall(15, positionZ);
     const walls = this.constructWalls(positionZ);
     const circularHit = this.constructCircularHit(25, positionZ);
     const spinners1 = this.constructSpinners(positionZ, -4.7);
     const spinners2 = this.constructSpinners(positionZ, 4.7);
-    this.endBlockGroup.add(
-      this.endWall,
-      walls,
-      circularHit,
-      spinners1,
-      spinners2
-    );
+    this.endBlockGroup.add(endWall, walls, circularHit, spinners1, spinners2);
     this.constructWinBoxes(positionZ);
     this.constructWinBoxBoundry(positionZ);
   }
@@ -64,7 +58,7 @@ export default class EndBlock {
           0
         );
         child.rotation.x = -Math.PI / 2;
-        child.position.z = positionZ ;
+        child.position.z = positionZ;
         child.position.x = positionX;
         child.position.y = 12;
         child.material.color = new Color(0xe70fff);
@@ -84,7 +78,7 @@ export default class EndBlock {
     const depth = 1;
     const endWall = new Mesh(
       new BoxGeometry(width, height, depth),
-      new MeshStandardMaterial({ color: "#e75480" })
+      new MeshStandardMaterial({ color: 0xe75480 })
     );
     const physicsEndWallBody = getPhysicsBody(
       endWall,
@@ -139,54 +133,19 @@ export default class EndBlock {
     const leftWall = this.createSideWall(positionZ, -10.5);
     const rightWall = this.createSideWall(positionZ, 10.5);
     const bottomWall = this.createBottomWall(positionZ);
-    const width = 9;
-    const height = 1;
-    const depth = 5.5;
-    const leftDiagonalWall1 = this.createDiagonalWall(
-      -8,
-      17.3,
-      positionZ,
-      Math.PI * 0.3,
-      width,
-      height,
-      depth
-    );
-    const leftDiagonalWall2 = this.createDiagonalWall(
-      -8,
-      24,
-      positionZ,
-      Math.PI * 0.7,
-      width,
-      height,
-      depth
-    );
-    const rightDiagonalWall1 = this.createDiagonalWall(
-      8,
-      24,
-      positionZ,
-      Math.PI * 0.3,
-      width,
-      height,
-      depth
-    );
-    const rightDiagonalWall2 = this.createDiagonalWall(
-      8,
-      17.3,
-      positionZ,
-      Math.PI * 0.7,
-      width,
-      height,
-      depth
-    );
-    wallsGroup.add(
-      leftWall,
-      rightWall,
-      bottomWall,
-      leftDiagonalWall1,
-      leftDiagonalWall2,
-      rightDiagonalWall1,
-      rightDiagonalWall2
-    );
+    for (let i = 0; i < DIAGONAL_WALLS_PROPS.length; i++) {
+      const diagonalWall = this.createDiagonalWall(
+        DIAGONAL_WALLS_PROPS[i].positionX,
+        DIAGONAL_WALLS_PROPS[i].positionY,
+        DIAGONAL_WALLS_PROPS[i].positionZ + positionZ,
+        DIAGONAL_WALLS_PROPS[i].angle,
+        DIAGONAL_WALLS_PROPS[i].width,
+        DIAGONAL_WALLS_PROPS[i].height,
+        DIAGONAL_WALLS_PROPS[i].depth
+      );
+      wallsGroup.add(diagonalWall);
+    }
+    wallsGroup.add(leftWall, rightWall, bottomWall);
     return wallsGroup;
   }
 

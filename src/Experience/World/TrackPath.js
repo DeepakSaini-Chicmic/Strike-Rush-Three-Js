@@ -9,7 +9,12 @@ import {
   SRGBColorSpace,
   RepeatWrapping,
   Color,
+  Vector3,
+  Quaternion,
+  Euler,
+  Matrix4,
 } from "three";
+import { InstancedMesh } from "three";
 
 export default class GameTrack {
   constructor(trackLength = 5, pathMaterial) {
@@ -20,72 +25,54 @@ export default class GameTrack {
     this.physicsWorld = physicsWorld;
     this.pathMaterial = pathMaterial;
     this.setTextures();
-    this.setMaterial();
+    this.width = 10;
+    this.geometry = this.setGeometry();
+    this.material = this.setMaterial();
     this.setUpTrack(trackLength);
   }
 
-  setGeometry() {
-    this.width = 10;
-    this.height = 1;
-    this.depth = 26;
-    let geometry = new BoxGeometry(this.width, this.height, this.depth);
-    return geometry;
-  }
-
   setTextures() {
-    this.textures = {};
     this.groundTexture = this.resources.items.groundTexture;
     this.groundTexture.colorSpace = SRGBColorSpace;
-    this.groundTexture.wrapS = RepeatWrapping;
-    this.groundTexture.wrapT = RepeatWrapping;
+  }
+
+  setGeometry() {
+    const height = 1;
+    const depth = 26;
+    return new BoxGeometry(this.width, height, depth);
   }
 
   setMaterial() {
-    this.material = new MeshStandardMaterial({
+    const material = new MeshStandardMaterial({
       map: this.groundTexture,
     });
-  }
-
-  setMesh(geometry) {
-    let mesh = new Mesh(geometry, this.material);
-    this.scene.add(mesh);
-    mesh.receiveShadow = true;
-    return mesh;
+    return material;
   }
 
   setUpTrack(noOfTiles) {
     this.trackTiles = [];
-    let tileGeometry = this.setGeometry();
-    let tileMesh = this.setMesh(tileGeometry);
-    let tileRigidBody = this.addPhysicsProperties(tileMesh);
-    tileRigidBody.position.set(0, 0 - 0.5, 0);
-    tileMesh.position.copy(tileRigidBody.position);
-    this.trackTiles.push(tileRigidBody);
-    noOfTiles--;
-
-    for (let tileNum = 0; tileNum < noOfTiles; tileNum++) {
-      tileGeometry = this.setGeometry();
-      tileMesh = this.setMesh(tileGeometry);
-      if (tileNum % 2 == 0) tileMesh.material.color = new Color(0x888888);
-      tileRigidBody = this.addPhysicsProperties(tileMesh);
-
-      let lastTilePos = this.trackTiles[this.trackTiles.length - 1];
-      tileRigidBody.position.set(0, 0 - 0.5, lastTilePos.position.z - 26);
-      tileMesh.position.copy(tileRigidBody.position);
-      this.trackTiles.push(tileRigidBody);
+    const tileGeometry = this.geometry;
+    const tileMaterial = this.material;
+    const tileMesh = new InstancedMesh(tileGeometry, tileMaterial, noOfTiles);
+    tileMesh.receiveShadow = true;
+    this.scene.add(tileMesh);
+    for (let i = 0; i < noOfTiles; i++) {
+      const position = new Vector3(0, 0 - 0.5, -noOfTiles * i);
+      const quaternion = new Quaternion();
+      quaternion.setFromEuler(new Euler(0, 0, 0));
+      const matrix = new Matrix4();
+      matrix.makeRotationFromQuaternion(quaternion);
+      matrix.setPosition(position);
+      tileMesh.setMatrixAt(i, matrix);
     }
-  }
-
-  addPhysicsProperties(object) {
-    //Physics
-    const rigidBody = getPhysicsBody(
-      object,
+    let tileRigidBody = getPhysicsBody(
+      tileMesh,
       ShapeType.BOX,
       this.pathMaterial,
       0
     );
-
-    this.physicsWorld.addBody(rigidBody);
-    return rigidBody;
+    tileRigidBody.position.copy(tileMesh.position);
+    tileRigidBody.quaternion.copy(tileMesh.quaternion);
+    this.physicsWorld.addBody(tileRigidBody);
   }
 }

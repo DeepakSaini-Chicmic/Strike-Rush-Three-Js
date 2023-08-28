@@ -3,6 +3,7 @@ import Experience from "../Experience.js";
 import { Mesh, MeshStandardMaterial, Group, BoxGeometry, Color } from "three";
 import { ShapeType } from "three-to-cannon";
 import { getPhysicsBody } from "../Utils/PhycisBodyHelper.js";
+import { Body, Box, Shape, Vec3 } from "cannon-es";
 
 export default class HealthBallsBlock {
   constructor(healthMaterial, blockPosition, noOfBallToPlace) {
@@ -15,6 +16,11 @@ export default class HealthBallsBlock {
     this.physicsWorld = physicsWorld;
     this.resource = resources.items.HealthBall;
     this.healthMaterial = healthMaterial;
+    this.material = new MeshStandardMaterial({
+      color: 0x0065ff,
+      map: this.resources.items.PlayerBall,
+      roughness: 1,
+    });
     this.creaditPoints = noOfBallToPlace; // The score user will get
     this.healthBlockGroup = new Group();
     this.healthBlockGroup.name = "Health-Add";
@@ -33,11 +39,7 @@ export default class HealthBallsBlock {
 
   createBalls() {
     let model = this.resource.clone().children.shift();
-    model.material = new MeshStandardMaterial({
-      color: 0x0065ff,
-      map: this.resources.items.PlayerBall,
-      roughness: 1,
-    });
+    model.material = this.material;
     model.scale.set(0.01, 0.01, 0.01);
     this.healthBlockGroup.add(model);
     return model;
@@ -66,17 +68,12 @@ export default class HealthBallsBlock {
     const maxY = 0.5; // Half of the sphere's diameter
     const maxZ = (gridSize - 1) * gap + 0.5;
 
-    let mesh = new Mesh(
-      new BoxGeometry(maxX, maxY, maxZ),
-      new MeshStandardMaterial({ color: 0xff0000 })
-    );
-    let scoreCollider = getPhysicsBody(
-      mesh,
-      ShapeType.BOX,
-      this.healthMaterial,
-      0
-    );
-
+    const scoreColliderShape = new Box(new Vec3(maxX / 2, maxY / 2, maxZ / 2));
+    const scoreCollider = new Body({
+      shape: scoreColliderShape,
+      mass: 0,
+      material: this.healthMaterial,
+    });
     scoreCollider.position.copy(this.healthBlockGroup.position);
     scoreCollider.position.y = positionToSetOn.y;
     scoreCollider.collisionResponse = 0;
