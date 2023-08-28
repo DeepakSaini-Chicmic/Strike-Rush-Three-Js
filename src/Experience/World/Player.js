@@ -161,28 +161,53 @@ export default class Player {
 
   registerEvents() {
     // window.addEventListener("mou");
-    window.addEventListener("mousemove", (event) => {
-      // Calculate mouse position in normalized device coordinates (-1 to 1)
-      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    if (this.experience.detectDevice()) {
+      window.addEventListener("touchmove", (event) => {
+        // Calculate mouse position in normalized device coordinates (-1 to 1)
+        const mouseX = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+        const mouseY = -(event.touches.clientY / window.innerHeight) * 2 + 1;
 
-      const min = -2.7;
-      const max = 2.7;
-      // Clamp number between two values with the following line:
-      const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+        const min = -2.7;
+        const max = 2.7;
+        // Clamp number between two values with the following line:
+        const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-      if (this.headBody && !this.isReachedDestination) {
-        this.headBody.position.x = mouseX * 4;
-        this.RigidBodiesArr.forEach((body, index) => {
-          if (index > 0) {
-            gsap.to(this.RigidBodiesArr[index].position, {
-              duration: 0.1,
-              x: this.RigidBodiesArr[index - 1].position.x,
-            });
-          }
-        });
-      }
-    });
+        if (this.headBody && !this.isReachedDestination) {
+          this.headBody.position.x = mouseX * 4;
+          this.RigidBodiesArr.forEach((body, index) => {
+            if (index > 0) {
+              gsap.to(this.RigidBodiesArr[index].position, {
+                duration: 0.1,
+                x: this.RigidBodiesArr[index - 1].position.x,
+              });
+            }
+          });
+        }
+      });
+    } else {
+      window.addEventListener("mousemove", (event) => {
+        // Calculate mouse position in normalized device coordinates (-1 to 1)
+        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        const min = -2.7;
+        const max = 2.7;
+        // Clamp number between two values with the following line:
+        const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+        if (this.headBody && !this.isReachedDestination) {
+          this.headBody.position.x = mouseX * 4;
+          this.RigidBodiesArr.forEach((body, index) => {
+            if (index > 0) {
+              gsap.to(this.RigidBodiesArr[index].position, {
+                duration: 0.1,
+                x: this.RigidBodiesArr[index - 1].position.x,
+              });
+            }
+          });
+        }
+      });
+    }
   }
 
   checkCollisionForBody(rigidBody) {
@@ -269,7 +294,7 @@ export default class Player {
                 duration: 0.6,
                 x: -1 + (0.4 * i) / 2,
                 y: 8.5,
-                z: -18 - i * 2,
+                z: -20 - i * 2,
               })
               .then(() => {
                 gsap

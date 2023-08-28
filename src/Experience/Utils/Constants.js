@@ -369,11 +369,6 @@ export const SOURCES = [
     type: "font",
     path: "fonts/LilitaOne_Regular.json",
   },
-  // {
-  //   name: "Buildings",
-  //   type: "fbxModel",
-  //   path: "models/Enviornment/St_Building.FBX",
-  // },
   {
     name: "BuildingsTexture",
     type: "texture",

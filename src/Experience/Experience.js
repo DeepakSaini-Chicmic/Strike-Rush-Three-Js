@@ -40,7 +40,7 @@ export default class Experience {
     this.physicsWorld = new World({ gravity: new Vec3(0, -9.8, 0) });
     this.world = new SceneWorld();
     this.cannonDebugger = new CannonDebugger(this.scene, this.physicsWorld);
-
+    console.log(this.detectDevice());
     // Resize event
     this.sizes.on("resize", () => {
       this.resize();
@@ -57,10 +57,24 @@ export default class Experience {
     this.renderer.resize();
   }
 
+  detectDevice() {
+    let isMobile = window.matchMedia;
+    if (isMobile) {
+      let match_mobile = isMobile("(pointer:coarse)");
+      return match_mobile.matches;
+    }
+    return false;
+  }
+
   update() {
     const deltaTime = this.time.delta;
     this.camera.update();
+    // console.log();
+    // const deltavalue =
+    //   (1000 / deltaTime).toFixed(0) > 60 ? 60 : (1000 / deltaTime).toFixed(0);
     this.physicsWorld.step(1 / 60, deltaTime, 3);
+    // if (this.detectDevice()) this.physicsWorld.step(1 / 30, deltaTime, 3);
+    // else this.physicsWorld.step(1 / 60, deltaTime, 3);
     this.world.update();
     // this.cannonDebugger.update();
     this.renderer.update();

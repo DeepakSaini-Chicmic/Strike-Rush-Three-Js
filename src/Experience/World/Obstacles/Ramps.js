@@ -54,7 +54,7 @@ export default class Ramps {
 
   createHiddenRampJumper(positionZ) {
     const boxMesh = new Mesh(
-      new BoxGeometry(10, 3.3, 8),
+      new BoxGeometry(10, 3.3, 15),
       new MeshStandardMaterial({ color: 0xfca510 })
     );
     const boxBody = getPhysicsBody(
@@ -64,7 +64,7 @@ export default class Ramps {
       0
     );
     boxBody.position.y = 1.4;
-    boxBody.position.z = positionZ - 5;
+    boxBody.position.z = positionZ - 8.5;
     this.physicsWorld.addBody(boxBody);
   }
 }

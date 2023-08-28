@@ -29,7 +29,7 @@ export default class Renderer {
       this.instance.setClearColor("#f47de9");
       this.instance.setSize(this.sizes.width, this.sizes.height);
       this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
-      this.initStatsUI();
+      // this.initStatsUI();
     });
   }
 
@@ -63,19 +63,19 @@ export default class Renderer {
 
   update() {
     if (this.instance) {
-      this.rS("frame").start();
-      this.glS.start();
-      this.rS("frame").start();
-      this.rS("rAF").tick();
-      this.rS("FPS").frame();
-      this.rS("action1").start();
-      /* Perform action #1 */
-      this.rS("action1").end();
-      this.rS("render").start();
+      // this.rS("frame").start();
+      // this.glS.start();
+      // this.rS("frame").start();
+      // this.rS("rAF").tick();
+      // this.rS("FPS").frame();
+      // this.rS("action1").start();
+      // /* Perform action #1 */
+      // this.rS("action1").end();
+      // this.rS("render").start();
       this.instance.render(this.scene, this.camera.instance);
-      this.rS("render").end();
-      this.rS("frame").end();
-      this.rS().update();
+      // this.rS("render").end();
+      // this.rS("frame").end();
+      // this.rS().update();
     }
   }
 }
