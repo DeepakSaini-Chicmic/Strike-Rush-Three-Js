@@ -153,7 +153,7 @@ export default class SceneWorld {
 
       this.centerRamp = new CenterRamp(
         this.centerRampMaterial,
-        new Vec3(2.5, -0.5, -8 * trackLength)
+        new Vec3(2.5, 0, -8 * trackLength)
       );
 
       this.rampGem1 = new GemsBlock(
@@ -164,7 +164,7 @@ export default class SceneWorld {
           filterGroup: COLLISION_GROUPS.GEMS_GROUP,
           filterMask: COLLISION_GROUPS.PLAYER_GROUP,
         },
-        new Vec3(6.5, 0.25, 20)
+        new Vec3(6.5, 1, 25)
       );
       this.rampGem2 = new GemsBlock(
         1,
@@ -174,7 +174,7 @@ export default class SceneWorld {
           filterGroup: COLLISION_GROUPS.GEMS_GROUP,
           filterMask: COLLISION_GROUPS.PLAYER_GROUP,
         },
-        new Vec3(6.5, 2, 15)
+        new Vec3(6.5, 2.5, 15)
       );
       this.rampGem3 = new GemsBlock(
         1,
@@ -214,7 +214,7 @@ export default class SceneWorld {
           filterGroup: COLLISION_GROUPS.GEMS_GROUP,
           filterMask: COLLISION_GROUPS.PLAYER_GROUP,
         },
-        new Vec3(6.5, 2, -5)
+        new Vec3(6.5, 2.5, -5)
       );
       this.rampGem7 = new GemsBlock(
         1,
@@ -224,7 +224,7 @@ export default class SceneWorld {
           filterGroup: COLLISION_GROUPS.GEMS_GROUP,
           filterMask: COLLISION_GROUPS.PLAYER_GROUP,
         },
-        new Vec3(6.5, 0.25, -10)
+        new Vec3(6.5, 1, -20)
       );
 
       this.ballPinObs3 = new BallPinsObstacle(

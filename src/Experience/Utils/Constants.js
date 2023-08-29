@@ -316,38 +316,38 @@ export const WINBOX_PROPS = [
 export const SOURCES = [
   {
     name: "ObstacleArmLiverHammer",
-    type: "fbxModel",
-    path: "models/Obstacle/HammerOneSideAnimation.fbx",
+    type: "gltfModel",
+    path: "gltfModels/Obstacle/HammerOneSideAnimation.glb",
   },
   {
     name: "ObstacleBowlingPin",
-    type: "fbxModel",
-    path: "models/Obstacle/BowlingPin.FBX",
+    type: "gltfModel",
+    path: "gltfModels/Obstacle/BowlingPin.glb",
   },
   {
     name: "Ramp1",
-    type: "fbxModel",
-    path: "models/Ramps/Ramp1.fbx",
+    type: "gltfModel",
+    path: "gltfModels/Ramps/Ramp1.glb",
   },
   {
     name: "CenterRamp",
-    type: "fbxModel",
-    path: "models/Ramps/MidRamp.fbx",
+    type: "gltfModel",
+    path: "gltfModels/Ramps/MidRamp.glb",
   },
   {
     name: "CenterRampTexture",
     type: "texture",
-    path: "models/Ramps/rampa_1.png",
+    path: "gltfModels/Ramps/rampa_1.png",
   },
   {
     name: "GemBall",
-    type: "fbxModel",
-    path: "models/BallAndGem/Gem.fbx",
+    type: "gltfModel",
+    path: "gltfModels/BallAndGem/Gem.glb",
   },
   {
     name: "HealthBall",
-    type: "fbxModel",
-    path: "models/BallAndGem/Ball.fbx",
+    type: "gltfModel",
+    path: "gltfModels/BallAndGem/Ball.glb",
   },
   {
     name: "groundTexture",
@@ -356,13 +356,13 @@ export const SOURCES = [
   },
   {
     name: "SpinnerObstacle",
-    type: "fbxModel",
-    path: "models/Obstacle/spinnerObs.fbx",
+    type: "gltfModel",
+    path: "gltfModels/Obstacle/spinnerObs.glb",
   },
   {
     name: "EndSpinner",
-    type: "fbxModel",
-    path: "models/Obstacle/SpinnerEnd.fbx",
+    type: "gltfModel",
+    path: "gltfModels/Obstacle/SpinnerEnd.glb",
   },
   {
     name: "scoreFont",
@@ -372,12 +372,12 @@ export const SOURCES = [
   {
     name: "BuildingsTexture",
     type: "texture",
-    path: "models/Enviornment/RGB_Alpha.png",
+    path: "gltfModels/Enviornment/RGB_Alpha.png",
   },
   {
     name: "FinishLine",
-    type: "fbxModel",
-    path: "models/Ramps/finishline.fbx",
+    type: "gltfModel",
+    path: "gltfModels/Ramps/finishline.glb",
   },
   {
     name: "HudGem",

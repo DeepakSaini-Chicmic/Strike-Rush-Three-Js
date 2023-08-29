@@ -3,6 +3,7 @@ import Experience from "../Experience.js";
 import { Vec3 } from "cannon-es";
 import { ShapeType } from "three-to-cannon";
 import { getPhysicsBody } from "../Utils/PhycisBodyHelper.js";
+import { MeshStandardMaterial } from "three";
 
 export default class GemsBlock {
   constructor(noOfGemLines, gemMaterial, positionZ, options, position) {
@@ -13,7 +14,7 @@ export default class GemsBlock {
     this.time = time;
     this.debug = debug;
     this.physicsWorld = physicsWorld;
-    this.resource = resources.items.GemBall;
+    this.resource = resources.items.GemBall.scene;
     this.gemMaterial = gemMaterial;
     this.positionZ = positionZ;
     this.diamondsMeshes = [];
@@ -25,6 +26,11 @@ export default class GemsBlock {
   createGemBalls(modelPosition) {
     const clonedModel = this.resource.clone();
     const model = clonedModel.children.shift();
+    // model.material = new MeshStandardMaterial({
+    //   color: 0x00ffff,
+    //   metalness: 1,
+    // });
+    model.material.metalness = 0.3;
     model.castShadow = true;
     this.diamondsMeshes.push(model);
     model.scale.set(0.007, 0.007, 0.007);
@@ -36,8 +42,8 @@ export default class GemsBlock {
       0
     );
     rigidBody.collisionResponse = 0;
-    const rotationAxis = new Vec3(1, 0, 0);
-    rigidBody.quaternion.setFromAxisAngle(rotationAxis, -Math.PI * 0.5);
+    // const rotationAxis = new Vec3(1, 0, 0);
+    // rigidBody.quaternion.setFromAxisAngle(rotationAxis, -Math.PI * 0.5);
     model.quaternion.copy(rigidBody.quaternion);
     rigidBody.quaternion.copy(model.quaternion);
     this.diamondsBodies.push(rigidBody);

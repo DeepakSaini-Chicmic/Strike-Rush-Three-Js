@@ -30,12 +30,22 @@ export default class Player {
     this.camera = camera.instance;
     this.playerMaterial = playerMaterial;
     this.endAnimation = false;
+    const value = {
+      a: "a",
+      a: "b",
+      c: "c",
+      d: {
+        a: "f",
+        e: "e",
+      },
+    };
+    this.call(value.d);
     this.endWallPositionZ = endWallPositionZ;
-    this.PlayerBallModel = this.resources.items.HealthBall;
+    this.PlayerBallModel = this.resources.items.HealthBall.scene;
     this.playerBallGeometry = this.PlayerBallModel.children[0].geometry;
     this.PlayerBallModel.children[0].geometry = null;
     this.PlayerBallModel.children[0].material = null;
-    this.gemModel = this.resources.items.GemBall;
+    this.gemModel = this.resources.items.GemBall.scene;
     this.gemCollected = 0;
 
     this.RigidBodiesArr = [];
@@ -53,7 +63,9 @@ export default class Player {
       this.RigidBodiesArr.length.toString()
     );
   }
-
+  call({ a }) {
+    console.log(a);
+  }
   createScoreText(score, size, headBodyPosition, positionZ) {
     // Score Popups
     const textGeometry = new TextGeometry(score, {
@@ -161,16 +173,10 @@ export default class Player {
 
   registerEvents() {
     // window.addEventListener("mou");
-    if (this.experience.detectDevice()) {
+    if (this.experience.isMobile) {
       window.addEventListener("touchmove", (event) => {
         // Calculate mouse position in normalized device coordinates (-1 to 1)
         const mouseX = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
-        const mouseY = -(event.touches.clientY / window.innerHeight) * 2 + 1;
-
-        const min = -2.7;
-        const max = 2.7;
-        // Clamp number between two values with the following line:
-        const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
         if (this.headBody && !this.isReachedDestination) {
           this.headBody.position.x = mouseX * 4;
@@ -188,13 +194,6 @@ export default class Player {
       window.addEventListener("mousemove", (event) => {
         // Calculate mouse position in normalized device coordinates (-1 to 1)
         const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        const min = -2.7;
-        const max = 2.7;
-        // Clamp number between two values with the following line:
-        const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-
         if (this.headBody && !this.isReachedDestination) {
           this.headBody.position.x = mouseX * 4;
           this.RigidBodiesArr.forEach((body, index) => {
@@ -279,38 +278,70 @@ export default class Player {
           this.scene.remove(this.playerBallCnt);
           this.endCameraAnimation();
           for (let i = 0; i < this.RigidBodiesArr.length; i++) {
-            gsap.to(this.camera.rotation, {
-              duration: 1,
-              x: this.camera.rotation.x + (Math.PI / 180) * 15,
-              z: 0,
-            });
-            gsap.to(this.camera.position, {
-              duration: 1,
-              y: this.camera.position.y - 3,
-              z: this.camera.position.z - 2,
-            });
-            gsap
-              .to(this.RigidBodiesArr[i].velocity, {
-                duration: 0.6,
-                x: -1 + (0.4 * i) / 2,
-                y: 8.5,
-                z: -20 - i * 2,
-              })
-              .then(() => {
-                gsap
-                  .to(this.RigidBodiesArr[i].velocity, {
-                    duration: 2,
-                    x: 0,
-                    y: -0.5 * deltaTime,
-                    z: 0,
-                  })
-                  .then(() => {
-                    this.RigidBodiesArr[i].angularDamping = 1;
-                    this.RigidBodiesArr[i].mass = 0.1;
-                  });
+            if (!this.experience.isMobile) {
+              gsap.to(this.camera.rotation, {
+                duration: 1,
+                x: this.camera.rotation.x + (Math.PI / 180) * 15,
+                z: 0,
               });
+              gsap.to(this.camera.position, {
+                duration: 1,
+                y: this.camera.position.y - 3,
+                z: this.camera.position.z - 2,
+              });
+              gsap
+                .to(this.RigidBodiesArr[i].velocity, {
+                  duration: 0.6,
+                  x: -1 + (0.4 * i) / 2,
+                  y: 8.5,
+                  z: -20 - i * 2,
+                })
+                .then(() => {
+                  gsap
+                    .to(this.RigidBodiesArr[i].velocity, {
+                      duration: 2,
+                      x: 0,
+                      y: -0.5 * deltaTime,
+                      z: 0,
+                    })
+                    .then(() => {
+                      this.RigidBodiesArr[i].angularDamping = 1;
+                      this.RigidBodiesArr[i].mass = 0.1;
+                    });
+                });
+            } else {
+              gsap.to(this.camera.rotation, {
+                duration: 1,
+                x: this.camera.rotation.x + (Math.PI / 180) * 15,
+                z: 0,
+              });
+              gsap.to(this.camera.position, {
+                duration: 1,
+                y: this.camera.position.y - 3,
+                z: this.camera.position.z - 2,
+              });
+              gsap
+                .to(this.RigidBodiesArr[i].velocity, {
+                  duration: 0.6,
+                  x: -1 + (0.4 * i) / 2,
+                  y: 13.5,
+                  z: -30 - i * 2,
+                })
+                .then(() => {
+                  gsap
+                    .to(this.RigidBodiesArr[i].velocity, {
+                      duration: 2,
+                      x: 0,
+                      y: -0.5 * deltaTime,
+                      z: 0,
+                    })
+                    .then(() => {
+                      this.RigidBodiesArr[i].angularDamping = 1;
+                      this.RigidBodiesArr[i].mass = 0.1;
+                    });
+                });
+            }
           }
-          1;
           break;
         }
         case COLLISION_BODIES.SCOREBOX: {

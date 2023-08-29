@@ -12,7 +12,7 @@ export default class Camera {
     this.canvas = canvas;
 
     this.setInstance();
-    // this.setControls();
+    this.setControls();
   }
 
   setInstance() {
@@ -38,6 +38,6 @@ export default class Camera {
   }
 
   update() {
-    // this.controls.update();
+    this.controls.update();
   }
 }

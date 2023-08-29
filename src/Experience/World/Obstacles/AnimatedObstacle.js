@@ -17,7 +17,8 @@ export default class AnimatedObstacle {
     this.obstacleMaterial = obstacleMaterial;
 
     // Resources
-    this.resource = obstacleType.clone();
+    this.resource = obstacleType.scene.clone();
+    console.log(this.resource);
     this.rigidBodiesArray = [];
     this.meshesArray = [];
     this.setModel(modelPosition, modelScaling);
@@ -25,6 +26,7 @@ export default class AnimatedObstacle {
 
   setModel(modelPosition, modelScaling) {
     this.model = this.resource;
+    this.model.scale.set(100, 100, 100);
     this.model.position.copy(modelPosition);
     this.model.traverse((child) => {
       if (child.isMesh) {
@@ -42,11 +44,11 @@ export default class AnimatedObstacle {
       }
     });
     this.scene.add(this.model);
-    this.playAnimation();
+    // this.playAnimation();
   }
 
   playAnimation() {
-    this.animation = this.model.animations[0];
+    this.animation = this.model.scene.animations[0];
     this.mixer = new AnimationMixer(this.model);
     const action = this.mixer.clipAction(this.animation);
     action.timeScale = 0.95;
@@ -57,7 +59,7 @@ export default class AnimatedObstacle {
     // this.mixer.update(this.time.delta * 0.001); //Anish-> Previous
     // this.mixer.update(this.time.delta); //Anish-> Changed
     const deltaTimeSeconds = this.time.delta * 0.001;
-    this.mixer.update(deltaTimeSeconds);
+    // this.mixer.update(deltaTimeSeconds);
     for (const [i, physicsBody] of this.rigidBodiesArray.entries()) {
       const mesh = this.meshesArray[i];
       physicsBody.position.copy(mesh.getWorldPosition(new Vector3()));

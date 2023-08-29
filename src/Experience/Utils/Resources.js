@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import EventEmitter from "./EventEmitter.js";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 export default class Resources extends EventEmitter {
   constructor(sources) {
@@ -20,6 +21,7 @@ export default class Resources extends EventEmitter {
   setLoaders() {
     this.loaders = {};
     this.loaders.gltfLoader = new GLTFLoader();
+    this.loaders.dracoLoader = new DRACOLoader();
     this.loaders.fbxLoader = new FBXLoader();
     this.loaders.textureLoader = new TextureLoader();
     this.loaders.cubeTextureLoader = new CubeTextureLoader();
@@ -31,6 +33,8 @@ export default class Resources extends EventEmitter {
     // Load each source
     for (const source of this.sources) {
       if (source.type === "gltfModel") {
+        this.loaders.dracoLoader.setDecoderPath("/draco/gltf/");
+        this.loaders.gltfLoader.setDRACOLoader(this.loaders.dracoLoader);
         this.loaders.gltfLoader.load(source.path, (file) => {
           this.sourceLoaded(source, file);
         });

@@ -37,27 +37,30 @@ export default class EndBlock {
 
   contructLastBlock(positionZ, wallMaterial) {
     this.wallMaterial = wallMaterial;
+    const spinMaterial = new MeshStandardMaterial({});
     const endWall = this.constructEndWall(15, positionZ);
     const walls = this.constructWalls(positionZ);
     const circularHit = this.constructCircularHit(25, positionZ);
-    const spinners1 = this.constructSpinners(positionZ, -4.7);
-    const spinners2 = this.constructSpinners(positionZ, 4.7);
+    const spinners1 = this.constructSpinners(positionZ, -4.7, spinMaterial);
+    const spinners2 = this.constructSpinners(positionZ, 4.7, spinMaterial);
     this.endBlockGroup.add(endWall, walls, circularHit, spinners1, spinners2);
     this.constructWinBoxes(positionZ);
     this.constructWinBoxBoundry(positionZ);
   }
 
-  constructSpinners(positionZ, positionX) {
-    const spinner = this.resources.items.EndSpinner.clone();
+  constructSpinners(positionZ, positionX, spinMaterial) {
+    const spinner = this.resources.items.EndSpinner.scene.clone();
     spinner.traverse((child) => {
       if (child.isMesh) {
+        child.material = spinMaterial;
+        child.scale.set(0.02, 0.02, 0.02);
         const childBody = getPhysicsBody(
           child,
           ShapeType.MESH,
           this.spinnerMaterial,
           0
         );
-        child.rotation.x = -Math.PI / 2;
+        child.rotation.x = -Math.PI * 2;
         child.position.z = positionZ;
         child.position.x = positionX;
         child.position.y = 12;
@@ -305,12 +308,12 @@ export default class EndBlock {
   update() {
     const deltaTime = this.time.delta;
     if (this.bodiesToUpdate[0]) {
-      this.meshesToUpdate[0].rotation.y -=
+      this.meshesToUpdate[0].rotation.z -=
         (Math.PI / 720) * deltaTime * this.randomValue;
       this.bodiesToUpdate[0].quaternion.copy(this.meshesToUpdate[0].quaternion);
     }
     if (this.bodiesToUpdate[1]) {
-      this.meshesToUpdate[1].rotation.y +=
+      this.meshesToUpdate[1].rotation.z +=
         (Math.PI / 720) * deltaTime * this.randomValue;
       this.bodiesToUpdate[1].quaternion.copy(this.meshesToUpdate[1].quaternion);
     }

@@ -2,7 +2,12 @@ import Experience from "../../Experience.js";
 import { getPhysicsBody } from "../../Utils/PhycisBodyHelper.js";
 import { ShapeType } from "three-to-cannon";
 
-import { Color } from "three";
+import {
+  Color,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  MeshStandardMaterial,
+} from "three";
 
 export default class BallPinsObstacle {
   constructor(
@@ -25,7 +30,8 @@ export default class BallPinsObstacle {
     this.positionZ = modelPosition.z;
     this.size = size;
     this.pathObstacleMaterial = pathObstacleMaterial;
-    this.resource = resources.items.ObstacleBowlingPin;
+    this.resource = resources.items.ObstacleBowlingPin.scene;
+    this.resource.material = new MeshBasicMaterial({});
     this.setUpBallPinsObstacle(modelScaling);
   }
 
@@ -38,6 +44,7 @@ export default class BallPinsObstacle {
   createBallingPins(noOfBallPins, modelScaling) {
     const ballPinsArr = [];
     const ballPinModel = this.resource.children[0];
+    ballPinModel.material = new MeshPhongMaterial({});
     for (let ballPinCnt = 0; ballPinCnt < noOfBallPins; ballPinCnt++) {
       ballPinsArr.push(ballPinModel.clone());
     }
@@ -45,7 +52,6 @@ export default class BallPinsObstacle {
       model.castShadow = true;
       model.material.color = new Color(0xffff00);
       model.scale.copy(modelScaling);
-      model.rotation.set(-Math.PI / 2, 0, 0);
     });
     return ballPinsArr;
   }

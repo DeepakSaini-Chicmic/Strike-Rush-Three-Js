@@ -14,7 +14,7 @@ export default class HealthBallsBlock {
     this.time = time;
     this.debug = debug;
     this.physicsWorld = physicsWorld;
-    this.resource = resources.items.HealthBall;
+    this.resource = resources.items.HealthBall.scene;
     this.healthMaterial = healthMaterial;
     this.material = new MeshStandardMaterial({
       color: 0x0065ff,

@@ -1,3 +1,4 @@
+import { NearestMipMapLinearFilter, NearestMipMapNearestFilter } from "three";
 import Experience from "../Experience.js";
 
 import {
@@ -79,7 +80,7 @@ export default class Environment {
   setEnvironment() {
     this.buildings = [];
     this.envMap = this.resources.items.environmentMapTexture;
-    this.envMap.magFilter = NearestFilter;
+    this.envMap.magFilter = NearestMipMapLinearFilter;
     this.envMap.minFilter = NearestFilter;
     const buildingGeometry = new BoxGeometry(200, 3000, 200);
     const buildingMaterial = new MeshStandardMaterial({
