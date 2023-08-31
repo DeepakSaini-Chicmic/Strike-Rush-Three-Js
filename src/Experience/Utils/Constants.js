@@ -13,6 +13,45 @@ export const COLLISION_BODIES = {
   SCOREBOX: "scorebox",
 };
 
+export const DIAGONAL_WALLS_PROPS = [
+  {
+    positionX: -8,
+    positionY: 17.3,
+    positionZ: 0,
+    angle: Math.PI * 0.3,
+    width: 9,
+    height: 1,
+    depth: 5.5,
+  },
+  {
+    positionX: -8,
+    positionY: 24,
+    positionZ: 0,
+    angle: Math.PI * 0.7,
+    width: 9,
+    height: 1,
+    depth: 5.5,
+  },
+  {
+    positionX: 8,
+    positionY: 24,
+    positionZ: 0,
+    angle: Math.PI * 0.3,
+    width: 9,
+    height: 1,
+    depth: 5.5,
+  },
+  {
+    positionX: 8,
+    positionY: 17.3,
+    positionZ: 0,
+    angle: Math.PI * 0.7,
+    width: 9,
+    height: 1,
+    depth: 5.5,
+  },
+];
+
 export const WINBOX_PROPS = [
   //FRONT WALL
   {
@@ -334,6 +373,16 @@ export const SOURCES = [
     name: "Buildings",
     type: "fbxModel",
     path: "models/Enviornment/St_Building.FBX",
+  },
+  {
+    name: "Hand",
+    type: "fbxModel",
+    path: "models/StartScreen/hand_anim04.FBX",
+  },
+  {
+    name: "HandAnim",
+    type: "fbxModel",
+    path: "models/StartScreen/hand_anim_Anim.FBX",
   },
   {
     name: "BuildingsTexture",

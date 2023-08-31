@@ -10,6 +10,8 @@ export default class CenterRamp {
     const { resources, scene, physicsWorld } = this.experience;
     this.resources = resources;
     this.rampModel = resources.items.CenterRamp.children[0];
+    this.rampModel.scale.y = this.rampModel.scale.y + 0.023;
+    this.rampModel.scale.z = this.rampModel.scale.z - 0.005;
     this.rampModelTexture = resources.items.CenterRampTexture;
     this.rampMaterial = rampMaterial;
     this.physicsWorld = physicsWorld;

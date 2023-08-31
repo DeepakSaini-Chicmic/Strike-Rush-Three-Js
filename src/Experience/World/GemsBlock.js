@@ -3,6 +3,7 @@ import Experience from "../Experience.js";
 import { Vec3 } from "cannon-es";
 import { ShapeType } from "three-to-cannon";
 import { getPhysicsBody } from "../Utils/PhycisBodyHelper.js";
+import { SRGBColorSpace } from "three";
 
 export default class GemsBlock {
   constructor(noOfGemLines, gemMaterial, positionZ, options, position) {
@@ -35,7 +36,7 @@ export default class GemsBlock {
       this.gemMaterial,
       0
     );
-    rigidBody.collisionResponse = 0;
+    rigidBody.collisionResponse = false;
     const rotationAxis = new Vec3(1, 0, 0);
     rigidBody.quaternion.setFromAxisAngle(rotationAxis, -Math.PI * 0.5);
     model.quaternion.copy(rigidBody.quaternion);

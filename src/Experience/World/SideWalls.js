@@ -11,49 +11,50 @@ export default class SideWalls {
     this.physicsWorld = physicsWorld;
     this.scene = scene;
     this.trackLength = tracklength;
-    this.wallMaterial = wallMaterial;
+    this.wallPhysicsMaterial = wallMaterial;
+    this.width = 0.5;
+    this.wallGeometry = new BoxGeometry(this.width, 1, this.trackLength);
+    this.wallMaterial = new MeshStandardMaterial({
+      color: 0xe459d2,
+      side: DoubleSide,
+    });
     this.constructSideWalls();
   }
 
   constructSideWalls() {
-    const width = 0.5;
-    const height = 1;
-    const depth = this.trackLength;
     const pathWidth = 10;
-    const leftWallMesh = this.constructWallMesh(width, height, depth);
-    const rightWallMesh = this.constructWallMesh(width, height, depth);
-    const leftWallBody = getPhysicsBody(
-      leftWallMesh,
-      ShapeType.BOX,
-      this.wallMaterial
-    );
-    const rightWallBody = getPhysicsBody(
-      rightWallMesh,
-      ShapeType.BOX,
-      this.wallMaterial
-    );
-    leftWallBody.position.set(
-      -pathWidth / 2 - width / 2,
+    let wallsBody = [];
+    for (let i = 0; i < 2; i++) {
+      const wall = this.constructWallMesh();
+      const physicsBody = getPhysicsBody(
+        wall,
+        ShapeType.BOX,
+        this.wallPhysicsMaterial
+      );
+      const currentObj = {
+        object: wall,
+        physicsBody: physicsBody,
+      };
+      wallsBody.push(currentObj);
+      this.physicsWorld.addBody(physicsBody);
+      this.scene.add(wall);
+    }
+    wallsBody[0].physicsBody.position.set(
+      -pathWidth / 2 - this.width / 2,
       -0.1,
       10 + this.trackLength / 2
     );
-    rightWallBody.position.set(
-      pathWidth / 2 + width / 2,
+    wallsBody[1].physicsBody.position.set(
+      pathWidth / 2 + this.width / 2,
       -0.1,
       10 + this.trackLength / 2
     );
-    leftWallMesh.position.copy(leftWallBody.position);
-    rightWallMesh.position.copy(rightWallBody.position);
-    this.physicsWorld.addBody(leftWallBody);
-    this.physicsWorld.addBody(rightWallBody);
-    this.scene.add(leftWallMesh, rightWallMesh);
+    wallsBody[0].object.position.copy(wallsBody[0].physicsBody.position);
+    wallsBody[1].object.position.copy(wallsBody[1].physicsBody.position);
   }
 
   constructWallMesh(width, height, depth) {
-    const wall = new Mesh(
-      new BoxGeometry(width, height, depth),
-      new MeshStandardMaterial({ color: 0xe459d2, side: DoubleSide })
-    );
+    const wall = new Mesh(this.wallGeometry, this.wallMaterial);
     wall.receiveShadow = true;
     return wall;
   }

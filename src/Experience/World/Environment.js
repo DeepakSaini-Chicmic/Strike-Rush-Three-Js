@@ -1,7 +1,17 @@
 import Experience from "../Experience.js";
 
-import { AmbientLight, DirectionalLight, Color, NearestFilter } from "three";
-
+import {
+  AmbientLight,
+  DirectionalLight,
+  NearestFilter,
+  BoxGeometry,
+  MeshStandardMaterial,
+  Quaternion,
+  Euler,
+  Matrix4,
+  InstancedMesh,
+  Vector3,
+} from "three";
 export default class Environment {
   constructor() {
     this.experience = new Experience();
@@ -70,34 +80,35 @@ export default class Environment {
     this.envMap = this.resources.items.environmentMapTexture;
     this.envMap.magFilter = NearestFilter;
     this.envMap.minFilter = NearestFilter;
-    this.scene.background = this.resources.items.environmentMapTexture;
-    this.building = this.resources.items.Buildings;
-    const buildingGeometry = this.building.children[0].geometry;
-    const buildingMaterial = this.building.children[0].material;
-    this.building.geometry = null;
-    this.building.material = null;
-    const noOfBuildings = 500;
-    for (let i = 0; i < noOfBuildings; i++) {
-      const building = this.building.clone();
-      this.building.traverse((child) => {
-        if (child.isMesh) {
-          child.geometry = buildingGeometry;
-          child.material = buildingMaterial;
-          child.material.transparent = false;
-          child.material.alphaTest = 0.1;
-          child.material.map = this.resources.items.BuildingsTexture;
-          child.material.color = new Color(0xe70fff);
-        }
-      });
-      building.scale.set(0.02, Math.random() / 10, 0.03);
-      building.rotation.x = -Math.PI / 2;
-      building.position.set(
-        (Math.random() - 0.5) * 3000,
-        -700 - Math.random() * 1000,
-        (Math.random() - 1) * 5000
+    const buildingGeometry = new BoxGeometry(200, 3000, 200);
+    const buildingMaterial = new MeshStandardMaterial({
+      color: 0xe70fff,
+      map: this.resources.items.BuildingsTexture,
+    });
+    buildingMaterial.map.offset.x = -1;
+    buildingMaterial.map.offset.y = -0.2;
+    //Instacnced Mesh will use same geometry and material for creating multiple meshes.
+    const building = new InstancedMesh(
+      buildingGeometry,
+      buildingMaterial,
+      2000
+    );
+    this.scene.add(building);
+
+    for (let i = 0; i < 1000; i++) {
+      const position = new Vector3(
+        (Math.random() - 0.5) * 10000,
+        -1600 - Math.random() * 3000,
+        -Math.random() * 20000
       );
-      this.scene.add(building);
-      this.buildings.push(building);
+      const quaternion = new Quaternion();
+      quaternion.setFromEuler(new Euler(0, 0, 0));
+      const matrix = new Matrix4();
+      matrix.makeRotationFromQuaternion(quaternion);
+      matrix.setPosition(position);
+      building.setMatrixAt(i, matrix);
     }
+    this.scene.background = this.resources.items.environmentMapTexture;
+    this.buildings.push(building);
   }
 }

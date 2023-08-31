@@ -9,6 +9,7 @@ export default class AudioManager {
     this.scene = scene;
     this.addAudioListener();
   }
+
   addAudioListener() {
     // instantiate a listener
     this.audioListener = new AudioListener();

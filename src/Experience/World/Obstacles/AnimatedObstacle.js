@@ -2,7 +2,14 @@ import Experience from "../../Experience.js";
 import { getPhysicsBody } from "../../Utils/PhycisBodyHelper.js";
 import { ShapeType } from "three-to-cannon";
 
-import { Vector3, AnimationMixer } from "three";
+import {
+  Vector3,
+  AnimationMixer,
+  BufferGeometry,
+  MeshBasicMaterial,
+  Line,
+  Mesh,
+} from "three";
 
 export default class AnimatedObstacle {
   constructor(obstacleType, modelPosition, modelScaling, obstacleMaterial) {
@@ -18,6 +25,23 @@ export default class AnimatedObstacle {
 
     // Resources
     this.resource = obstacleType.clone();
+    this.pointsArray = [];
+    let i = 0;
+    this.resource.traverse((child) => {
+      if (child.isMesh) {
+        console.log(child.geometry);
+        this.pointsArray[i++] = child.geometry;
+      }
+    });
+    const obs = this.pointsArray[--i];
+
+    const material = new MeshBasicMaterial({ color: 0xffffff });
+
+    const lineMesh = new Mesh(obs, material);
+    
+
+
+    this.scene.add(lineMesh);
     this.rigidBodiesArray = [];
     this.meshesArray = [];
     this.setModel(modelPosition, modelScaling);

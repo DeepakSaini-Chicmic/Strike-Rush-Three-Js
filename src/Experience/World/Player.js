@@ -3,31 +3,24 @@ import EndGamePopup from "./EndGamePopUp.js";
 import { getPhysicsBody } from "../Utils/PhycisBodyHelper.js";
 import { ShapeType } from "three-to-cannon";
 
-import { Mesh, MeshStandardMaterial, Group, Color } from "three";
+import { Mesh, MeshStandardMaterial, Group, Color, Skeleton } from "three";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { gsap } from "gsap";
 import { COLLISION_BODIES } from "../Utils/Constants.js";
+import Hand from "./Hand.js";
 
 export default class Player {
   constructor(playerMaterial, options, endWallPositionZ) {
     this.experience = new Experience();
-    const {
-      scene,
-      audioManager,
-      resources,
-      time,
-      debug,
-      physicsWorld,
-      camera,
-    } = this.experience;
+    const { scene, audioManager, resources, time, physicsWorld, camera } =
+      this.experience;
     this.scene = scene;
     this.audioManager = audioManager;
     this.resources = resources;
     this.time = time;
-    this.debug = debug;
     this.physicsWorld = physicsWorld;
-    this.camera = camera.instance;
+    this.camera = camera;
     this.playerMaterial = playerMaterial;
     this.endAnimation = false;
     this.endWallPositionZ = endWallPositionZ;
@@ -46,9 +39,11 @@ export default class Player {
     // this.playerVelocity = 0;
 
     this.createPlayer(7);
+    this.eventsRegistered = false;
     this.headBody = this.RigidBodiesArr[0];
     // this.playerVelocity = this.headBody.velocity.x;
-    this.registerEvents();
+    this.onClick();
+    this.hand = new Hand();
     this.playerBallCnt = this.createPlayerCntText(
       this.RigidBodiesArr.length.toString()
     );
@@ -140,49 +135,72 @@ export default class Player {
     textMesh.position.y = 0.2;
     textMesh.rotation.x = (Math.PI / 180) * -30;
     // crete text base
-    let textBaseMesh = new Mesh(
+    this.textBaseMesh = new Mesh(
       new RoundedBoxGeometry(1.1, 1.1, 1, 10, 0.2),
       new MeshStandardMaterial({ color: "#FF10F0" })
     );
-    textBaseMesh.lookAt(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z
+    this.textBaseMesh.lookAt(
+      this.camera.instance.position.x,
+      this.camera.instance.position.y,
+      this.camera.instance.position.z
     );
-    textBaseMesh.position.y = 0.1;
+    this.textBaseMesh.position.y = 0.1;
 
     ballCnt.add(textMesh);
-    ballCnt.add(textBaseMesh);
+    ballCnt.add(this.textBaseMesh);
     ballCnt.position.y = 2;
     this.scene.add(ballCnt);
 
     return ballCnt;
   }
 
+  startScreenAnimation() {
+    gsap
+      .to(this.camera.instance.position, { duration: 1, x: 0, y: 15, z: 45 })
+      .then(() => {
+        this.registerEvents();
+      });
+  }
+
+  onClick() {
+    window.addEventListener("click", () => this.startScreenAnimation());
+  }
+
   registerEvents() {
-    // window.addEventListener("mou");
-    window.addEventListener("mousemove", (event) => {
-      // Calculate mouse position in normalized device coordinates (-1 to 1)
-      const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-      const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      const min = -2.7;
-      const max = 2.7;
-      // Clamp number between two values with the following line:
-      const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-
-      if (this.headBody && !this.isReachedDestination) {
-        this.headBody.position.x = mouseX * 4;
-        this.RigidBodiesArr.forEach((body, index) => {
-          if (index > 0) {
-            gsap.to(this.RigidBodiesArr[index].position, {
-              duration: 0.1,
-              x: this.RigidBodiesArr[index - 1].position.x,
-            });
-          }
-        });
-      }
-    });
+    window.removeEventListener("click", () => this.startScreenAnimation());
+    this.hand.removeModel();
+    this.eventsRegistered = true;
+    if (this.experience.detectDevice()) {
+      window.addEventListener("touchmove", (event) => {
+        const mouseX = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+        if (this.headBody && !this.isReachedDestination) {
+          this.headBody.position.x = mouseX * 4;
+          this.RigidBodiesArr.forEach((body, index) => {
+            if (index > 0) {
+              gsap.to(this.RigidBodiesArr[index].position, {
+                duration: 0.1,
+                x: this.RigidBodiesArr[index - 1].position.x,
+              });
+            }
+          });
+        }
+      });
+    } else {
+      window.addEventListener("mousemove", (event) => {
+        const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        if (this.headBody && !this.isReachedDestination) {
+          this.headBody.position.x = mouseX * 4;
+          this.RigidBodiesArr.forEach((body, index) => {
+            if (index > 0) {
+              gsap.to(this.RigidBodiesArr[index].position, {
+                duration: 0.1,
+                x: this.RigidBodiesArr[index - 1].position.x,
+              });
+            }
+          });
+        }
+      });
+    }
   }
 
   checkCollisionForBody(rigidBody) {
@@ -232,6 +250,7 @@ export default class Player {
         }
         case COLLISION_BODIES.OBSTACLE: {
           collide.body.collisionFilterMask = 0;
+          collide.body.collisionResponse = false;
           if (this.RigidBodiesArr.length) {
             // gsap.delayedCall(5, this.removePlayerBalls());
             this.removePlayerBalls(); // Subtracting Player's Health by removing the balls
@@ -249,19 +268,15 @@ export default class Player {
           break;
         }
         case COLLISION_BODIES.ENDRAMP: {
+          const deltaTime = this.time.delta / 1000;
           this.isReachedDestination = true;
           this.scene.remove(this.playerBallCnt);
           this.endCameraAnimation();
           for (let i = 0; i < this.RigidBodiesArr.length; i++) {
-            gsap.to(this.camera.rotation, {
+            gsap.to(this.camera.instance.rotation, {
               duration: 1,
-              x: this.camera.rotation.x + (Math.PI / 180) * 15,
+              x: this.camera.instance.rotation.x + (Math.PI / 180) * 15,
               z: 0,
-            });
-            gsap.to(this.camera.position, {
-              duration: 1,
-              y: this.camera.position.y - 3,
-              z: this.camera.position.z - 2,
             });
             gsap
               .to(this.RigidBodiesArr[i].velocity, {
@@ -275,12 +290,12 @@ export default class Player {
                   .to(this.RigidBodiesArr[i].velocity, {
                     duration: 2,
                     x: 0,
-                    y: -0.5,
+                    y: -0.5 * deltaTime,
                     z: 0,
                   })
                   .then(() => {
                     this.RigidBodiesArr[i].angularDamping = 1;
-                    this.RigidBodiesArr[i].mass = 0.1;
+                    this.RigidBodiesArr[i].mass = 0.15;
                   });
               });
           }
@@ -297,53 +312,49 @@ export default class Player {
               this.headBody.position.z,
               6
             );
-            const collectedBall = this.RigidBodiesArr.findIndex(
-              (item) => item.name === collide.target.name
-            );
-            // if (collectedBall) this.RigidBodiesArr[collectedBall];
-            let gemCollected = this.gemModel.clone().children.shift();
-            gemCollected.position.set(
-              Math.random() * (6.2 - -6.2) + -6.2,
-              collide.body.position.y + 5,
-              collide.body.position.z
-            );
+            for (let i = 0; i < Number(collide.body.myData.score[0]); i++) {
+              let gemCollected = this.gemModel.clone().children.shift();
+              gemCollected.position.set(
+                Math.random() * (6.2 - -6.2) + -6.2,
+                collide.body.position.y + 5,
+                collide.body.position.z
+              );
+              this.scene.add(gemCollected);
 
-            this.scene.add(gemCollected);
-
+              const timeline = gsap.timeline();
+              timeline
+                .to(gemCollected.position, {
+                  duration: 0.3,
+                  y: collide.target.position.y + Math.random() * 7,
+                })
+                .to(gemCollected.scale, {
+                  duration: 1,
+                  x: 0.02,
+                  y: 0.02,
+                  z: 0.02,
+                }) // Scale in
+                .to(gemCollected.scale, {
+                  duration: 0.8,
+                  x: 0.015,
+                  y: 0.015,
+                  z: 0.015,
+                }) // Scale out
+                .to(gemCollected.position, {
+                  duration: 1,
+                  x: 9,
+                  y: 42.5,
+                  z: this.endWallPositionZ,
+                })
+                .then(() => {
+                  ++this.gemCollected;
+                  document.getElementById("gemsCollected").textContent =
+                    this.gemCollected;
+                  gemCollected.material.dispose();
+                  gemCollected.geometry.dispose();
+                  this.scene.remove(gemCollected);
+                });
+            }
             // Gem Animation
-
-            const timeline = gsap.timeline();
-            timeline
-              .to(gemCollected.position, {
-                duration: 0.3,
-                y: collide.target.position.y + Math.random() * 7,
-              })
-              .to(gemCollected.scale, {
-                duration: 1,
-                x: 0.02,
-                y: 0.02,
-                z: 0.02,
-              }) // Scale in
-              .to(gemCollected.scale, {
-                duration: 0.8,
-                x: 0.015,
-                y: 0.015,
-                z: 0.015,
-              }) // Scale out
-              .to(gemCollected.position, {
-                duration: 1,
-                x: 12,
-                y: 48,
-                z: this.endWallPositionZ,
-              })
-              .then(() => {
-                ++this.gemCollected;
-                document.getElementById("gemsCollected").textContent =
-                  this.gemCollected;
-                gemCollected.material.dispose();
-                gemCollected.geometry.dispose();
-                this.scene.remove(gemCollected);
-              });
           }
           collide.body.position.set(900, 200, 0);
           break;
@@ -360,7 +371,7 @@ export default class Player {
     let rigidBody = this.RigidBodiesArr.shift();
     let mesh = this.bodyMeshesArr.shift();
 
-    rigidBody.collisionResponse = 0;
+    rigidBody.collisionResponse = false;
     rigidBody.collisionFilterMask = 0;
     rigidBody.collisionFilterGroup = 0;
 
@@ -413,12 +424,13 @@ export default class Player {
   }
 
   endCameraAnimation() {
-    gsap.to(this.camera.position, {
+    gsap.to(this.camera.instance.position, {
       duration: 1,
       onStart: () => {
-        this.camera.lookAt(0, 5.75, -400);
+        this.camera.instance.lookAt(0, 0, -400);
       },
-      z: this.camera.position.z - 60,
+      y: this.camera.instance.position.y,
+      z: this.camera.instance.position.z - 35,
     });
     this.endAnimation = true;
   }
@@ -446,37 +458,51 @@ export default class Player {
   }
 
   update() {
-    // Update snake's head position based on this.direction
-    // this.playerVelocity += -200 * this.time.delta;
-    if (this.headBody && !this.isReachedDestination) {
-      // this.headBody.velocity.z = Math.round(this.playerVelocity);
-      this.headBody.velocity.z = -15;
-      this.headBody.velocity.x = 0;
-      if (this.headBody.velocity.z > -10) {
+    if (this.hand) this.hand.update();
+    if (this.eventsRegistered) {
+      // Update snake's head position based on this.direction
+      const deltaTime = this.time.delta / 1000;
+      if (this.headBody && !this.isReachedDestination) {
         // this.headBody.velocity.z = Math.round(this.playerVelocity);
-        this.headBody.velocity.z = -15;
+        this.headBody.velocity.z = -15 * deltaTime;
+        this.headBody.velocity.x = 0 * deltaTime;
+        if (this.headBody.velocity.z > -10) {
+          this.headBody.velocity.z = -15;
+        }
       }
-      this.playerBallCnt.position.x = this.headBody.position.x;
-      this.playerBallCnt.position.z = this.headBody.position.z;
-    }
 
-    for (
-      let body = 1;
-      body < this.RigidBodiesArr.length && !this.isReachedDestination;
-      body++
-    ) {
-      this.RigidBodiesArr[body].velocity.x = 0;
-      this.RigidBodiesArr[body].position.z =
-        this.RigidBodiesArr[body - 1].position.z + 2;
+      for (
+        let body = 1;
+        body < this.RigidBodiesArr.length && !this.isReachedDestination;
+        body++
+      ) {
+        this.RigidBodiesArr[body].velocity.x = 0;
+        this.RigidBodiesArr[body].position.z =
+          this.RigidBodiesArr[body - 1].position.z + 2;
 
-      if (body > 0) {
-        gsap.to(this.RigidBodiesArr[body].position, {
-          duration: 0.1,
-          x: this.RigidBodiesArr[body - 1].position.x,
-        });
+        if (body > 0) {
+          gsap.to(this.RigidBodiesArr[body].position, {
+            duration: 0.1,
+            x: this.RigidBodiesArr[body - 1].position.x,
+          });
+        }
       }
-    }
 
+      if (this.RigidBodiesArr.length && !this.isReachedDestination) {
+        this.camera.instance.position.set(
+          0,
+          this.RigidBodiesArr[0].position.y + 15,
+          this.RigidBodiesArr[0].position.z + 45
+        );
+        this.camera.instance.lookAt(
+          0,
+          this.RigidBodiesArr[0].position.y,
+          this.RigidBodiesArr[0].position.z
+        );
+      }
+    } else {
+      this.camera.instance.lookAt(0, 0, 0);
+    }
     // Update Three.js sphere positions based on physics simulation
     for (let i = 0; i < this.RigidBodiesArr.length; i++) {
       let sphereBody = this.RigidBodiesArr[i];
@@ -484,18 +510,15 @@ export default class Player {
       sphereMesh.position.copy(sphereBody.position);
       sphereMesh.quaternion.copy(sphereBody.quaternion);
     }
-
-    if (this.RigidBodiesArr.length && !this.isReachedDestination) {
-      this.camera.position.set(
-        0,
-        this.RigidBodiesArr[0].position.y + 20,
-        this.RigidBodiesArr[0].position.z + 60
+    if (this.headBody) {
+      this.textBaseMesh.lookAt(
+        this.camera.instance.position.x,
+        this.camera.instance.position.y,
+        this.camera.instance.position.z
       );
-      this.camera.lookAt(
-        0,
-        this.RigidBodiesArr[0].position.y,
-        this.RigidBodiesArr[0].position.z
-      );
+      this.playerBallCnt.position.x = this.headBody.position.x;
+      this.playerBallCnt.position.y = this.headBody.position.y + 1.5;
+      this.playerBallCnt.position.z = this.headBody.position.z;
     }
   }
 }

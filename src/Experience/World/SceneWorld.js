@@ -156,16 +156,16 @@ export default class SceneWorld {
         new Vec3(2.5, -0.5, -8 * trackLength)
       );
 
-      this.rampGem1 = new GemsBlock(
-        1,
-        this.gemMaterial,
-        -trackLength * 8,
-        {
-          filterGroup: COLLISION_GROUPS.GEMS_GROUP,
-          filterMask: COLLISION_GROUPS.PLAYER_GROUP,
-        },
-        new Vec3(6.5, 0.25, 20)
-      );
+      // this.rampGem1 = new GemsBlock(
+      //   1,
+      //   this.gemMaterial,
+      //   -trackLength * 8,
+      //   {
+      //     filterGroup: COLLISION_GROUPS.GEMS_GROUP,
+      //     filterMask: COLLISION_GROUPS.PLAYER_GROUP,
+      //   },
+      //   new Vec3(6.5, 0.25, 20)
+      // );
       this.rampGem2 = new GemsBlock(
         1,
         this.gemMaterial,
@@ -174,7 +174,7 @@ export default class SceneWorld {
           filterGroup: COLLISION_GROUPS.GEMS_GROUP,
           filterMask: COLLISION_GROUPS.PLAYER_GROUP,
         },
-        new Vec3(6.5, 2, 15)
+        new Vec3(6.5, 2.5, 15)
       );
       this.rampGem3 = new GemsBlock(
         1,
@@ -214,18 +214,18 @@ export default class SceneWorld {
           filterGroup: COLLISION_GROUPS.GEMS_GROUP,
           filterMask: COLLISION_GROUPS.PLAYER_GROUP,
         },
-        new Vec3(6.5, 2, -5)
+        new Vec3(6.5, 2.5, -5)
       );
-      this.rampGem7 = new GemsBlock(
-        1,
-        this.gemMaterial,
-        -trackLength * 8,
-        {
-          filterGroup: COLLISION_GROUPS.GEMS_GROUP,
-          filterMask: COLLISION_GROUPS.PLAYER_GROUP,
-        },
-        new Vec3(6.5, 0.25, -10)
-      );
+      // this.rampGem7 = new GemsBlock(
+      //   1,
+      //   this.gemMaterial,
+      //   -trackLength * 8,
+      //   {
+      //     filterGroup: COLLISION_GROUPS.GEMS_GROUP,
+      //     filterMask: COLLISION_GROUPS.PLAYER_GROUP,
+      //   },
+      //   new Vec3(6.5, 0.25, -10)
+      // );
 
       this.ballPinObs3 = new BallPinsObstacle(
         4,
@@ -234,13 +234,6 @@ export default class SceneWorld {
         this.obstacleMaterial,
         this.pathObstacleMaterial
       );
-      // this.ballPinObs4 = new BallPinsObstacle(
-      //   4,
-      //   new Vector3(-1.6, 0, -15 * trackLength),
-      //   new Vector3(0.009, 0.009, 0.009),
-      //   this.obstacleMaterial,
-      //   this.pathObstacleMaterial
-      // );
 
       this.gemsBlock2 = new GemsBlock(
         5,
@@ -303,26 +296,6 @@ export default class SceneWorld {
         },
         -trackLength * 26 + 7
       );
-      // window.addEventListener("click", (event) => {
-      //   this.PlayerObj = new Player(
-      //     this.playerMaterial,
-      //     {
-      //       filterGroup: COLLISION_GROUPS.PLAYER_GROUP,
-      //       filterMask: COLLISION_GROUPS.GEMS_GROUP,
-      //     },
-      //     -trackLength * 26 + 7
-      //   );
-      // })
-      // setTimeout(() => {
-      //   this.PlayerObj = new Player(
-      //     this.playerMaterial,
-      //     {
-      //       filterGroup: COLLISION_GROUPS.PLAYER_GROUP,
-      //       filterMask: COLLISION_GROUPS.GEMS_GROUP,
-      //     },
-      //     -trackLength * 26 + 7
-      //   );
-      // }, 1000);
 
       this.endBlock = new EndBlock(
         -trackLength * 26 + 7,

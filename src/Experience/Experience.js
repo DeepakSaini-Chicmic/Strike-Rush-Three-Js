@@ -41,6 +41,10 @@ export default class Experience {
     this.world = new SceneWorld();
     this.cannonDebugger = new CannonDebugger(this.scene, this.physicsWorld);
 
+    this.t = 0.0;
+    console.log(this.physicsWorld.default_dt);
+    this.dt = this.physicsWorld.default_dt;
+    this.currentTime = performance.now(); // or your preferred high-res timer
     // Resize event
     this.sizes.on("resize", () => {
       this.resize();
@@ -57,11 +61,29 @@ export default class Experience {
     this.renderer.resize();
   }
 
+  detectDevice() {
+    let isMobile = window.matchMedia;
+    if (isMobile) {
+      let match_mobile = isMobile("(pointer:coarse)");
+      return match_mobile.matches;
+    }
+    return false;
+  }
+
   update() {
+    // let newTime = performance.now();
+    // let frameTime = (newTime - this.currentTime) / 1000; // Convert to seconds
+    // this.currentTime = newTime;
+    // console.log(frameTime);
+    // while (frameTime > 0) {
+    //   const deltaTime = Math.min(frameTime, this.dt);
     const deltaTime = this.time.delta;
-    this.camera.update();
     this.physicsWorld.step(1 / 60, deltaTime, 3);
+    //   frameTime -= deltaTime;
+    //   this.t += deltaTime;
+    // }
     this.world.update();
+    this.camera.update();
     // this.cannonDebugger.update();
     this.renderer.update();
   }
